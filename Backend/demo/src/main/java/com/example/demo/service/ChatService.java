@@ -23,6 +23,9 @@ public class ChatService {
     @Autowired
     private MessageRepository messageRepository;
 
+    @Autowired
+    private GroqLLMService groqLLMService;  // ✅ Inject LLM service
+
     public Message processChat(Long userId, String userMessage, Long conversationId) {
         User user = userRepository.findById(userId).orElseThrow();
         ConversationSession session;
@@ -32,24 +35,27 @@ public class ChatService {
         } else {
             session = new ConversationSession();
             session.setUser(user);
-            session.setCreatedAt(LocalDateTime.now());  // ✅ FIXED: changed to LocalDateTime
+            session.setCreatedAt(LocalDateTime.now());  // ✅ Use LocalDateTime
             session = sessionRepository.save(session);
         }
 
-        // Save user message
+        // Save user's message
         Message userMsg = new Message();
         userMsg.setSession(session);
         userMsg.setSender("user");
         userMsg.setContent(userMessage);
-        userMsg.setTimestamp(LocalDateTime.now());  // ✅ LocalDateTime
+        userMsg.setTimestamp(LocalDateTime.now());
         messageRepository.save(userMsg);
 
-        // Simulated AI response
+        // 🔗 Get response from Groq LLM
+        String aiReply = groqLLMService.getLLMResponse(userMessage);
+
+        // Save AI response
         Message aiMsg = new Message();
         aiMsg.setSession(session);
         aiMsg.setSender("ai");
-        aiMsg.setContent("This is a sample AI response.");
-        aiMsg.setTimestamp(LocalDateTime.now());  // ✅ LocalDateTime
+        aiMsg.setContent(aiReply);
+        aiMsg.setTimestamp(LocalDateTime.now());
         return messageRepository.save(aiMsg);
     }
 }

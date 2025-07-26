@@ -8,6 +8,9 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import java.time.OffsetDateTime;
 
+import jakarta.persistence.*;
+import java.util.List;
+
 @Entity
 @Table(name = "users")
 @Data
@@ -31,4 +34,26 @@ public class User {
     private Double longitude;
     private String trafficSource;
     private OffsetDateTime createdAt;
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+    private List<ConversationSession> sessions;
+    public User(Long id, String firstName, String lastName, String email, Integer age,
+                String gender, String state, String streetAddress, String postalCode, String city,
+                String country, Double latitude, Double longitude, String trafficSource, OffsetDateTime createdAt) {
+        this.id = id;
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.email = email;
+        this.age = age;
+        this.gender = gender;
+        this.state = state;
+        this.streetAddress = streetAddress;
+        this.postalCode = postalCode;
+        this.city = city;
+        this.country = country;
+        this.latitude = latitude;
+        this.longitude = longitude;
+        this.trafficSource = trafficSource;
+        this.createdAt = createdAt;
+    }
 }
